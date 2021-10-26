@@ -1,0 +1,10 @@
+{
+  "com.obdx.meezan": {
+    "source": {
+      "type": "local",
+      "path": "C:\\Meezan-Bank\\Cordova\\Card-THS\\platforms\\android\\node_modules\\com.obdx.meezan"
+    },
+    "is_top_level": true,
+    "variables": {}
+  }
+}
