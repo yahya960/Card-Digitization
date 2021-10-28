@@ -41,6 +41,7 @@ import com.gemalto.mfs.mwsdk.mobilegateway.utils.MGCardInfoEncryptor;
 import com.gemalto.mfs.mwsdk.payment.CHVerificationMethod;
 import com.gemalto.mfs.mwsdk.provisioning.ProvisioningServiceManager;
 import com.gemalto.mfs.mwsdk.provisioning.model.EnrollmentStatus;
+import com.gemalto.mfs.mwsdk.provisioning.model.GetAccessTokenMode;
 import com.gemalto.mfs.mwsdk.provisioning.sdkconfig.EnrollingBusinessService;
 import com.gemalto.mfs.mwsdk.provisioning.sdkconfig.ProvisioningBusinessService;
 import com.gemalto.mfs.mwsdk.utils.async.AbstractAsyncHandler;
@@ -210,7 +211,10 @@ return true;
                 @Override
                 public void run() {
                     try {
-//                        HistoryActivity historyActivity = new HistoryActivity(to)
+                        THSCard.callbackObject = callbackContext;
+                        String card_Digital_ID = args.getString(0);
+                        HistoryActivity historyActivity = new HistoryActivity(card_Digital_ID,callbackContext);
+                        historyActivity.fetchHistory(GetAccessTokenMode.NO_REFRESH);
 
                         return;
 

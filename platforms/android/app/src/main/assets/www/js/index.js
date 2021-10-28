@@ -20,6 +20,8 @@
 // Wait for the deviceready event before using any of Cordova's device APIs.
 // See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
 var ThsCard;
+var Cards;
+var transaction_history;
 var app = {
     //Application constructor
     initialize: function() {
@@ -101,7 +103,7 @@ var app = {
     cardLoad: function(){
 
       var successCallback = function(res) {
-           console.log(res)
+          Cards = JSON.parse(res)
             }
             var errorCallback = function(err) {
             alert("Error",err)
@@ -114,14 +116,13 @@ var app = {
                     res == "Configured Already" ? alert(res) : alert(`SUCCESS!!! `+ res);
                 }
                 var errorCallback = function(err) {
-                    alert('ERROR!!! ' + err)
                 }
                 ThsCard.acceptterms(successCallback, errorCallback);
         },
         getTransactionHistory: function(){
 
                var successCallback = function(res) {
-                         res == "Configured Already" ? alert(res) : alert(`SUCCESS!!! `+ res);
+                         transaction_history = JSON.parse(res)
                      }
                      var errorCallback = function(err) {
                          alert('ERROR!!! ' + err)

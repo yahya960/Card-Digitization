@@ -76,13 +76,13 @@ public class DisplayCards {
                         JSONObject item = new JSONObject();
                         try {
                             item.put("TokenId",card.getTokenId());
-                            item.put("Digital Card ID",card.getDigitalizedCardId());
+                            item.put("Digital_Card_ID",card.getDigitalizedCardId());
                             item.put("Default",card.isDefaultCardFlag());
-                            item.put("Card State",card.getCardStatus().getState());
-                            item.put("Payment Remaining",numberOfPayment);
-                            item.put("PAN Expiry",asyncResult.getResult().getPanExpiry());
-                            item.put("DPAN LastDigit",asyncResult.getResult().getLastFourDigitsOfDPAN());
-                            item.put("FPAN LastDigit",asyncResult.getResult().getLastFourDigits());
+                            item.put("Card_State",card.getCardStatus().getState());
+                            item.put("Payment_Remaining",numberOfPayment);
+                            item.put("PAN_Expiry",asyncResult.getResult().getPanExpiry());
+                            item.put("DPAN_LastDigit",asyncResult.getResult().getLastFourDigitsOfDPAN());
+                            item.put("FPAN_LastDigit",asyncResult.getResult().getLastFourDigits());
                             response.put(item);
                             if(a == cards.size()){
                                 callbackObject.success(response.toString());

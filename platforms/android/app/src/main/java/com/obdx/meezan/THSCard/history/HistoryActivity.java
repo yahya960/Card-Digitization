@@ -1,5 +1,6 @@
 package com.obdx.meezan.THSCard.history;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -23,8 +24,12 @@ import com.obdx.meezan.THSCard.model.TransactionHistory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.cordova.CordovaPlugin;
 
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class HistoryActivity extends CordovaPlugin {
@@ -39,14 +44,16 @@ public class HistoryActivity extends CordovaPlugin {
     private int retryCount;
     private String digitalCardId;
     private RecyclerView recyclerView;
+    private static CallbackContext callbackContext;
 //    private AppExecutors appExecutors;
 
 
-    public HistoryActivity(String digitalCardId) {
+    public HistoryActivity(String digitalCardId, CallbackContext callbackContext) {
         this.digitalCardId = digitalCardId;
+        this.callbackContext = callbackContext;
     }
 
-    private void fetchHistory(String digitalCardId, GetAccessTokenMode accessMode) {
+    public void fetchHistory(GetAccessTokenMode accessMode) {
         ProvisioningServiceManager.getProvisioningBusinessService().getAccessToken(digitalCardId, accessMode,
                 new AccessTokenListener() {
                     @Override
@@ -69,26 +76,40 @@ public class HistoryActivity extends CordovaPlugin {
                 new TransactionHistoryListener() {
                     @Override
                     public void onSuccess(final List<MGTransactionRecord> transactionRecord, String digitalCardId, String timeStamp) {
-                        cordova.getThreadPool().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                final List<TransactionHistory> history = new ArrayList<>();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            JSONArray response = new JSONArray();
+                            int a = 0;
+                            final List<TransactionHistory> history = new ArrayList<>();
 //                                Toast.makeText(getApplicationContext(), "Received transaction history : " + transactionRecord.size(),
 //                                        Toast.LENGTH_SHORT).show();
-                                for (final MGTransactionRecord allRecords : transactionRecord) {
-                                    final TransactionHistory mRecords = new TransactionHistory(allRecords);
-                                    mRecords.setTransactionId(allRecords.getTransactionId());
-                                    mRecords.setTransactionAmount(allRecords.getDisplayAmount());
-                                    mRecords.setMerchantName(allRecords.getMerchantName());
-                                    mRecords.setTransactionStatus(allRecords.getTransactionStatus());
-
-                                    history.add(mRecords);
+                            for (final MGTransactionRecord allRecords : transactionRecord) {
+                                a++;
+                                JSONObject item = new JSONObject();
+                                final TransactionHistory mRecords = new TransactionHistory(allRecords);
+                                mRecords.setTransactionId(allRecords.getTransactionId());
+                                mRecords.setTransactionAmount(allRecords.getDisplayAmount());
+                                mRecords.setMerchantName(allRecords.getMerchantName());
+                                mRecords.setTransactionStatus(allRecords.getTransactionStatus());
+                                try {
+                                    item.put("Transaction_ID", allRecords.getTransactionId());
+                                    item.put("Transaction_Amount", allRecords.getDisplayAmount());
+                                    item.put("Merchant_Name", allRecords.getMerchantName());
+                                    item.put("Transaction_Status", allRecords.getTransactionStatus());
+                                    response.put(item);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
 
-//                                recyclerView.setAdapter(new HistoryListAdapter(getApplicationContext(), history));
+                                history.add(mRecords);
                             }
-                        });
+
+                            callbackContext.success(response.toString());
+
+//                                recyclerView.setAdapter(new HistoryListAdapter(getApplicationContext(), history));
+                        }
+
                     }
+
 
                     @Override
                     public void onError(String digitalCardId, MobileGatewayError mobileGatewayError) {
@@ -103,7 +124,7 @@ public class HistoryActivity extends CordovaPlugin {
             if (SERVER_ERROR_CODES_TO_RETRY.contains(serverErrorCode)
                     && retryCount < MAX_RETRY_COUNT) {
                 retryCount++;
-                fetchHistory(digitalCardId, GetAccessTokenMode.NO_REFRESH);
+                fetchHistory(GetAccessTokenMode.NO_REFRESH);
             } else {
                 cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -120,7 +141,7 @@ public class HistoryActivity extends CordovaPlugin {
                 case 401:
                     if (!mTokenRefreshRequested) {
                         mTokenRefreshRequested = true;
-                        fetchHistory(digitalCardId, GetAccessTokenMode.REFRESH);
+                        fetchHistory(GetAccessTokenMode.REFRESH);
                         break;
                     }
                 default:

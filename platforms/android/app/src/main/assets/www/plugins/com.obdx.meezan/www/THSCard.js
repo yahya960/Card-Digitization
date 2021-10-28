@@ -112,7 +112,7 @@ exports.getTransactionHistory = function(aSuccessCallback, aErrorCallback) {
     var onError = function(errMessage) {
         errorCallback(toError(errMessage))
     }
-    exec(onSuccess, onError, 'THSCard', 'getTransactionHistory', [this.name])
+    exec(onSuccess, onError, 'THSCard', 'getTransactionHistory', [Cards[0].Digital_Card_ID])
 }
 
 function isArray(value) {
