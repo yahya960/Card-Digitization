@@ -11,6 +11,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,16 +38,20 @@ import com.gemalto.mfs.mwsdk.mobilegateway.enrollment.IssuerData;
 import com.gemalto.mfs.mwsdk.mobilegateway.enrollment.TermsAndConditionSession;
 import com.gemalto.mfs.mwsdk.mobilegateway.enrollment.TermsAndConditions;
 import com.gemalto.mfs.mwsdk.mobilegateway.listener.CardEligibilityListener;
+import com.gemalto.mfs.mwsdk.mobilegateway.listener.MGCardLifecycleEventListener;
 import com.gemalto.mfs.mwsdk.mobilegateway.utils.MGCardInfoEncryptor;
 import com.gemalto.mfs.mwsdk.payment.CHVerificationMethod;
 import com.gemalto.mfs.mwsdk.provisioning.ProvisioningServiceManager;
+import com.gemalto.mfs.mwsdk.provisioning.listener.AccessTokenListener;
 import com.gemalto.mfs.mwsdk.provisioning.model.EnrollmentStatus;
 import com.gemalto.mfs.mwsdk.provisioning.model.GetAccessTokenMode;
+import com.gemalto.mfs.mwsdk.provisioning.model.ProvisioningServiceError;
 import com.gemalto.mfs.mwsdk.provisioning.sdkconfig.EnrollingBusinessService;
 import com.gemalto.mfs.mwsdk.provisioning.sdkconfig.ProvisioningBusinessService;
 import com.gemalto.mfs.mwsdk.utils.async.AbstractAsyncHandler;
 import com.gemalto.mfs.mwsdk.utils.async.AsyncResult;
 import com.gemalto.mfs.mwsdk.utils.chcodeverifier.CHCodeVerifier;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.obdx.meezan.MainActivity;
 import com.obdx.meezan.THSCard.history.HistoryActivity;
@@ -204,7 +209,7 @@ public class THSCard extends CordovaPlugin implements CardEligibilityListener {
 //            };
 ////                    boolean success =;
 //            task.execute();
-return true;
+            return true;
         }
         if (action.equals("getTransactionHistory")) {
             cordova.getThreadPool().execute(new Runnable() {
@@ -215,8 +220,6 @@ return true;
                         String card_Digital_ID = args.getString(0);
                         HistoryActivity historyActivity = new HistoryActivity(card_Digital_ID,callbackContext);
                         historyActivity.fetchHistory(GetAccessTokenMode.NO_REFRESH);
-
-                        return;
 
 //                        if (success) {
 //                            callbackContext.success("card is digitized");
@@ -231,7 +234,82 @@ return true;
 
             return true;
         }
-        return true;
+
+        if (action.equals("deleteCard")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        THSCard.callbackObject = callbackContext;
+//                        MyDigitalCard card = new MyDigitalCard();
+                        String DigitalizedCardId = args.getString(0);
+                        String selected_action = "Delete";
+                        if(selected_action!=null && !selected_action.isEmpty()) {
+//                            if (selected_action.equalsIgnoreCase("Suspend"))) {
+////                                manageCard(card,false);
+//                                Log.d("Suspend","Suspend");
+//                            }else if (selected_action.equalsIgnoreCase("Resume"))) {
+////                              Log.d("Suspend","Suspend");
+////                                manageCard(card,true);
+//                            } else {
+                                deleteCard(DigitalizedCardId);
+//                            }
+                        }
+                    } catch (Exception e) {
+                        callbackContext.error(e.getMessage());
+                    }
+                }
+            });
+
+            return true;
+        }
+
+        if (action.equals("suspendCard")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        THSCard.callbackObject = callbackContext;
+                        String DigitalizedCardId = args.getString(0);
+                        String selected_action = "Suspend";
+                        if(selected_action!=null && !selected_action.isEmpty()) {
+                            if (selected_action.equalsIgnoreCase("Suspend")) {
+                                manageCard(DigitalizedCardId, false);
+//                                Log.d("Suspend","Suspend");
+                            }
+                        }
+                    } catch (Exception e) {
+                        callbackContext.error(e.getMessage());
+                    }
+                }
+            });
+
+            return true;
+        }
+
+        if (action.equals("resumeCard")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        THSCard.callbackObject = callbackContext;
+                        String DigitalizedCardId = args.getString(0);
+                        String selected_action = "Resume";
+                        if(selected_action!=null && !selected_action.isEmpty()) {
+                            if (selected_action.equalsIgnoreCase("Resume")) {
+                                manageCard(DigitalizedCardId, true);
+//                                Log.d("Suspend","Suspend");
+                            }
+                        }
+                    } catch (Exception e) {
+                        callbackContext.error(e.getMessage());
+                    }
+                }
+            });
+
+            return true;
+        }
+        return false;
     }
 
 
@@ -350,14 +428,14 @@ return true;
                             Object additionalObject = additionalInformation.get(STORAGE_COMPONENT_EXCEPTION_KEY);
                             if (additionalObject != null && additionalObject instanceof Exception) {
                                 Exception exception = (Exception) additionalObject;
-//                                AppLogger.e(TAG, "Get All cards failed because" + exception.getMessage());
+//                                // AppLogger.e(TAG, "Get All cards failed because" + exception.getMessage());
                                 exception.printStackTrace();
                                 //In production app, this event to be sent to Analytics server. Exception stack trace can be sent to analytics, if available.
                                 //If exception stack trace is not possible, please send atleast the exception message. (e.getMessage() to analytics
                             }
                         }
                         // the production MPA can retry again instead.
-//                        AppLogger.e(TAG, "Failed to reload the card list due to secure storage: " + asyncResult.getErrorMessage());
+//                        // AppLogger.e(TAG, "Failed to reload the card list due to secure storage: " + asyncResult.getErrorMessage());
                         // if issue, persists even after certain number of retries. Recommend to do the following
                         // 1. Send a specific error event that retry failed
                         // 2. SDK APIs cannot be used in this user session anymore. so block all SDK usage from this point onward
@@ -365,7 +443,7 @@ return true;
 
                     else if (errorCode == DigitalizedCardErrorCodes.CD_CVM_REQUIRED) {
 //
-//                        AppLogger.d(TAG, "CD_CVM_REQUIRED");
+//                        // AppLogger.d(TAG, "CD_CVM_REQUIRED");
 
 
                         DeviceCVMEligibilityResult result =
@@ -399,6 +477,116 @@ return true;
 
     }
 
+    @SuppressLint("StaticFieldLeak")
+    private void manageCard(String DigitalizedCardId,final  boolean isResume) {
+
+        // AppLogger.i(TAG,"manageCard");
+        new AsyncTask<Object, Object, Object>(){
+
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                // AppLogger.i(TAG,"doInBackground");
+                ProvisioningBusinessService provisioningBusinessService=ProvisioningServiceManager.getProvisioningBusinessService();
+                if (provisioningBusinessService == null) {
+                    // AppLogger.i(TAG, "provisioningBusinessService is null");
+//                    Snackbar snackbar = Snackbar
+//                            .make(coordinatorLayout, "Error(1), cannot suspend card", Snackbar.LENGTH_LONG);
+//                    snackbar.show();
+//                    toggleProgress(false);
+                    THSCard.callbackObject.error("Cannot Suspend Card");
+                } else {
+                    // AppLogger.i(TAG, "getAccessToken");
+                    provisioningBusinessService.getAccessToken(DigitalizedCardId,
+                            GetAccessTokenMode.NO_REFRESH, new AccessTokenListener() {
+                                @Override
+                                public void onSuccess(String digitalCardID, String accessToken) {
+                                    // AppLogger.i(TAG,"getAccessToken::onSuccess");
+
+                                    if(!isResume){
+                                        MobileGatewayManager.INSTANCE.getCardLifeCycleManager().suspendCard(
+                                                DigitalizedCardId,
+                                                new MGCardLifecycleEventListener() {
+                                                    @Override
+                                                    public void onSuccess(String s) {
+
+                                                        // AppLogger.i(TAG,"suspendcard ::onSuccess");
+                                                     Log.d("suspendcard", "onSuccess");
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError(String s, final MobileGatewayError mobileGatewayError) {
+                                                        // AppLogger.i(TAG,"suspendcard ::onError");
+                                                        Log.d("suspendcard", "onError");
+                                                    }
+                                                },null,null,accessToken);
+                                    }else{
+                                        MobileGatewayManager.INSTANCE.getCardLifeCycleManager().resumeCard(
+                                                DigitalizedCardId,
+                                                new MGCardLifecycleEventListener() {
+                                                    @Override
+                                                    public void onSuccess(String s) {
+
+                                                        // AppLogger.i(TAG,"resumeCard ::onSuccess");
+                                                        Log.d("resumeCard", "onSuccess");
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError(String s, final MobileGatewayError mobileGatewayError) {
+                                                        // AppLogger.i(TAG,"resumeCard ::onError");
+                                                        Log.d("resumeCard", "onError");
+                                                    }
+                                                },null,null,accessToken);
+                                    }
+
+
+                                }
+
+                                @Override
+                                public void onError(String s, ProvisioningServiceError provisioningServiceError) {
+                                    // AppLogger.i(TAG,"access Token ::onError");
+                                    Log.d("access Token", "onError");
+                                }
+                            });
+                }
+                return null;
+
+            }
+        }.execute();
+
+    }
+
+    public void deleteCard(String DigitalizedCardId) {
+        //starting the delete request.
+        MobileGatewayManager.INSTANCE.getCardLifeCycleManager().deleteCard(DigitalizedCardId, new MGCardLifecycleEventListener() {
+            @Override
+            public void onSuccess(String s) {
+                Log.d("Card Deleted","Card Deleted");
+//                appExecutors.mainThread().execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        toggleProgress(false);
+//                        Snackbar snackbar = Snackbar
+//                                .make(coordinatorLayout, "Request sent to delete card", Snackbar.LENGTH_LONG);
+//                        snackbar.show();
+//                    }
+//                });
+
+            }
+
+            @Override
+            public void onError(String s, final MobileGatewayError mobileGatewayError) {
+//                appExecutors.mainThread().execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(getApplicationContext(), mobileGatewayError.getMessage(), Toast.LENGTH_SHORT).show();
+//                        toggleProgress(false);
+//                    }
+//                });
+            }
+        });
+    }
 //    private void enablePin() {
 //        WalletPinManager.getInstance().bindAbstractWalletPinService(new AbstractWalletPinService() {
 //            @Override

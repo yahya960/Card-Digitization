@@ -115,6 +115,69 @@ exports.getTransactionHistory = function(aSuccessCallback, aErrorCallback) {
     exec(onSuccess, onError, 'THSCard', 'getTransactionHistory', [Cards[0].Digital_Card_ID])
 }
 
+exports.deleteCard = function(aSuccessCallback, aErrorCallback) {
+ var successCallback = aSuccessCallback || noop
+    var errorCallback = aErrorCallback || noop
+
+    if (!isFunction(successCallback)) {
+        throw new TypeError("Missing or invalid argument, 'successCallback'. Function expected.")
+    }
+
+    if (!isFunction(errorCallback)) {
+        throw new TypeError("Invalid argument, 'errorCallback'. Function expected.")
+    }
+
+    var onSuccess = function(res) {
+        successCallback(res)
+    }
+    var onError = function(errMessage) {
+        errorCallback(toError(errMessage))
+    }
+    exec(onSuccess, onError, 'THSCard', 'deleteCard', [Cards[0].Digital_Card_ID])
+}
+
+exports.suspendCard = function(aSuccessCallback, aErrorCallback) {
+ var successCallback = aSuccessCallback || noop
+    var errorCallback = aErrorCallback || noop
+
+    if (!isFunction(successCallback)) {
+        throw new TypeError("Missing or invalid argument, 'successCallback'. Function expected.")
+    }
+
+    if (!isFunction(errorCallback)) {
+        throw new TypeError("Invalid argument, 'errorCallback'. Function expected.")
+    }
+
+    var onSuccess = function(res) {
+        successCallback(res)
+    }
+    var onError = function(errMessage) {
+        errorCallback(toError(errMessage))
+    }
+    exec(onSuccess, onError, 'THSCard', 'suspendCard', [Cards[0].Digital_Card_ID])
+}
+
+exports.resumeCard = function(aSuccessCallback, aErrorCallback) {
+ var successCallback = aSuccessCallback || noop
+    var errorCallback = aErrorCallback || noop
+
+    if (!isFunction(successCallback)) {
+        throw new TypeError("Missing or invalid argument, 'successCallback'. Function expected.")
+    }
+
+    if (!isFunction(errorCallback)) {
+        throw new TypeError("Invalid argument, 'errorCallback'. Function expected.")
+    }
+
+    var onSuccess = function(res) {
+        successCallback(res)
+    }
+    var onError = function(errMessage) {
+        errorCallback(toError(errMessage))
+    }
+    exec(onSuccess, onError, 'THSCard', 'resumeCard', [Cards[0].Digital_Card_ID])
+}
+
 function isArray(value) {
     return /^\[object Array\]$/.test(Object.prototype.toString.call(value))
 }

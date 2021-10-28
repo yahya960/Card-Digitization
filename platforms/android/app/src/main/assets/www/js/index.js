@@ -45,10 +45,13 @@ var app = {
         ThsCard = window.cordova.plugins.THSCard;
 
         document.getElementById('addCard').addEventListener('click', this.addCard);
-         document.getElementById('cardLoad').addEventListener('click', this.cardLoad);
-//          document.getElementById('acceptterms').addEventListener('click', this.acceptterms);
-           document.getElementById('getTransactionHistory').addEventListener('click', this.getTransactionHistory);
+        document.getElementById('cardLoad').addEventListener('click', this.cardLoad);
+//      document.getElementById('acceptterms').addEventListener('click', this.acceptterms);
+        document.getElementById('getTransactionHistory').addEventListener('click', this.getTransactionHistory);
         document.getElementById('initMGSDK').addEventListener('click', this.initMDSDK);
+        document.getElementById('deleteCard').addEventListener('click', this.deleteCard);
+         document.getElementById('suspendCard').addEventListener('click', this.suspendCard);
+          document.getElementById('resumeCard').addEventListener('click', this.resumeCard);
         const cardNumber = document.getElementById('cardNumber');
         const expiry = document.getElementById('expiry');
         const cvv = document.getElementById('cvv');
@@ -129,5 +132,35 @@ var app = {
                      }
                      ThsCard.getTransactionHistory(successCallback, errorCallback);
              },
+             deleteCard: function(){
+
+                            var successCallback = function(res) {
+                                      transaction_history = JSON.parse(res)
+                                  }
+                                  var errorCallback = function(err) {
+                                      alert('ERROR!!! ' + err)
+                                  }
+                                  ThsCard.deleteCard(successCallback, errorCallback);
+                          },
+              suspendCard: function(){
+
+                    var successCallback = function(res) {
+                              transaction_history = JSON.parse(res)
+                          }
+                          var errorCallback = function(err) {
+                              alert('ERROR!!! ' + err)
+                          }
+                          ThsCard.suspendCard(successCallback, errorCallback);
+                  },
+                       resumeCard: function(){
+
+                                var successCallback = function(res) {
+                                          transaction_history = JSON.parse(res)
+                                      }
+                                      var errorCallback = function(err) {
+                                          alert('ERROR!!! ' + err)
+                                      }
+                                      ThsCard.resumeCard(successCallback, errorCallback);
+                              },
 }
 app.initialize();
