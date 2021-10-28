@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.obdx.meezan.BuildConfig;
 import com.obdx.meezan.THSCard.Constants;
+import com.obdx.meezan.THSCard.app.AppConstants;
 
 public abstract class SharedPreferenceUtils {
     private static SharedPreferences sp;
@@ -68,13 +69,13 @@ public abstract class SharedPreferenceUtils {
         editor.apply();
     }
 
-//    public static String getBenchmark(Context context) {
-//        //AppLogger.d(TAG, "getBenchmark");
-//        sp = context.getApplicationContext().getSharedPreferences(DEFAULT_CARD_TABLE_NAME, AppCompatActivity.MODE_PRIVATE);
-//        String benchmark = sp.getString(BENCHMARK_FLAVOUR_KEY, Constants.Schemes.MASTERCARD.name() );
-//        //AppLogger.d(TAG, "getBenchmark" + benchmark);
-//        return benchmark;
-//    }
+    public static String getBenchmark(Context context) {
+        //AppLogger.d(TAG, "getBenchmark");
+        sp = context.getApplicationContext().getSharedPreferences(DEFAULT_CARD_TABLE_NAME, AppCompatActivity.MODE_PRIVATE);
+        String benchmark = sp.getString(BENCHMARK_FLAVOUR_KEY, AppConstants.Schemes.MASTERCARD.name() );
+        //AppLogger.d(TAG, "getBenchmark" + benchmark);
+        return benchmark;
+    }
 
     public static void setNeedWipeAll(Context context, boolean wipeNeeded) {
         //AppLogger.d(TAG, "saveNeedWipeAll " + wipeNeeded);

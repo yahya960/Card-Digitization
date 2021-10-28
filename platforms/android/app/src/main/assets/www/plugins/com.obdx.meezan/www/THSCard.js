@@ -94,6 +94,27 @@ exports.acceptterms= function(aSuccessCallback, aErrorCallback) {
     exec(onSuccess, onError, 'THSCard', 'acceptterms', [this.name])
 }
 
+exports.getTransactionHistory = function(aSuccessCallback, aErrorCallback) {
+ var successCallback = aSuccessCallback || noop
+    var errorCallback = aErrorCallback || noop
+
+    if (!isFunction(successCallback)) {
+        throw new TypeError("Missing or invalid argument, 'successCallback'. Function expected.")
+    }
+
+    if (!isFunction(errorCallback)) {
+        throw new TypeError("Invalid argument, 'errorCallback'. Function expected.")
+    }
+
+    var onSuccess = function(res) {
+        successCallback(res)
+    }
+    var onError = function(errMessage) {
+        errorCallback(toError(errMessage))
+    }
+    exec(onSuccess, onError, 'THSCard', 'getTransactionHistory', [this.name])
+}
+
 function isArray(value) {
     return /^\[object Array\]$/.test(Object.prototype.toString.call(value))
 }

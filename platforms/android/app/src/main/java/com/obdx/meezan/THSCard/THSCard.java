@@ -48,6 +48,7 @@ import com.gemalto.mfs.mwsdk.utils.async.AsyncResult;
 import com.gemalto.mfs.mwsdk.utils.chcodeverifier.CHCodeVerifier;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.obdx.meezan.MainActivity;
+import com.obdx.meezan.THSCard.history.HistoryActivity;
 import com.obdx.meezan.THSCard.model.MyDigitalCard;
 import com.obdx.meezan.THSCard.util.TokenReplenishmentRequestor;
 
@@ -128,7 +129,7 @@ public class THSCard extends CordovaPlugin implements CardEligibilityListener {
 
                         THSCard.callbackObject = callbackContext;
                         boolean success = addCard(cardNumber, expiry, cvv);
-                        loadCards(callbackObject);
+//                        loadCards(callbackObject);
 
                         if (success) {
 //                            callbackContext.success("card is eligible");
@@ -202,9 +203,31 @@ public class THSCard extends CordovaPlugin implements CardEligibilityListener {
 //            };
 ////                    boolean success =;
 //            task.execute();
-
+return true;
         }
-        return false;
+        if (action.equals("getTransactionHistory")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+//                        HistoryActivity historyActivity = new HistoryActivity(to)
+
+                        return;
+
+//                        if (success) {
+//                            callbackContext.success("card is digitized");
+//                        }
+
+//                        callbackContext.error("failed to execute");
+                    } catch (Exception e) {
+                        callbackContext.error(e.getMessage());
+                    }
+                }
+            });
+
+            return true;
+        }
+        return true;
     }
 
 
@@ -292,12 +315,13 @@ public class THSCard extends CordovaPlugin implements CardEligibilityListener {
                             mCards.add(mCard);
                     }
 
-                    DisplayCards displayCards =new DisplayCards(cordova.getContext(),
-//                            this,
-                            mCards,
-                            DisplayCards.DisplayType.CARD_LIST_MAIN,callbackContext);
-                    totalCards.add( displayCards.showCards(0));
-        callbackContext.success(totalCards.toString());
+//                    DisplayCards displayCards =new DisplayCards(cordova.getContext(),
+////                            this,
+//                            mCards,
+//                            DisplayCards.DisplayType.CARD_LIST_MAIN,callbackContext);
+//                    totalCards.add( displayCards.showCards(0));
+//                    Log.d("Total Cards",totalCards.toString());
+                    THSCard.callbackObject.success(mCards.toString());
 
 
 //                    findViewById(R.id.no_cards).setVisibility((mCards.size() > 0) ? View.GONE : View.VISIBLE);

@@ -19,8 +19,19 @@
 
 package com.obdx.meezan;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.nfc.cardemulation.CardEmulation;
+import android.os.Build;
 import android.os.Bundle;
+
+import com.obdx.meezan.THSCard.app.AppConstants;
+
 import org.apache.cordova.*;
+
+import static android.nfc.cardemulation.CardEmulation.ACTION_CHANGE_DEFAULT;
+import static android.nfc.cardemulation.CardEmulation.EXTRA_CATEGORY;
+import static android.nfc.cardemulation.CardEmulation.EXTRA_SERVICE_COMPONENT;
 
 public class MainActivity extends CordovaActivity
 {
@@ -38,6 +49,28 @@ public class MainActivity extends CordovaActivity
         // Set by <content src="index.html" /> in config.xml
         loadUrl(launchUrl);
 
-
+        checkTapAndPay();
+    }
+    public void checkTapAndPay() {
+        if (!isEmulator()) {
+            Intent activate = new Intent();
+            activate.setAction(ACTION_CHANGE_DEFAULT);
+            activate.putExtra(EXTRA_SERVICE_COMPONENT, new ComponentName(this,
+                    AppConstants.CANONICAL_PAYMENT_SERVICENAME));
+            activate.putExtra(EXTRA_CATEGORY, CardEmulation.CATEGORY_PAYMENT);
+            startActivity(activate);
+        }
+    }
+    private static boolean isEmulator() {
+        String model = Build.MODEL;
+//        AppLogger.d(TAG, "model=" + model);
+        String product = Build.PRODUCT;
+//        AppLogger.d(TAG, "product=" + product);
+        boolean isEmulator = false;
+        if (product != null) {
+            isEmulator = product.equals("sdk") || product.contains("_sdk") || product.contains("sdk_");
+        }
+//        AppLogger.d(TAG, "isEmulator=" + isEmulator);
+        return isEmulator;
     }
 }

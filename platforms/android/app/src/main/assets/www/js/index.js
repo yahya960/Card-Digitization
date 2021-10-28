@@ -44,7 +44,8 @@ var app = {
 
         document.getElementById('addCard').addEventListener('click', this.addCard);
          document.getElementById('cardLoad').addEventListener('click', this.cardLoad);
-          document.getElementById('acceptterms').addEventListener('click', this.acceptterms);
+//          document.getElementById('acceptterms').addEventListener('click', this.acceptterms);
+           document.getElementById('getTransactionHistory').addEventListener('click', this.getTransactionHistory);
         document.getElementById('initMGSDK').addEventListener('click', this.initMDSDK);
         const cardNumber = document.getElementById('cardNumber');
         const expiry = document.getElementById('expiry');
@@ -100,10 +101,10 @@ var app = {
     cardLoad: function(){
 
       var successCallback = function(res) {
-            console.debug(res)
+           console.log(res)
             }
             var errorCallback = function(err) {
-            console.debug("Error",err)
+            alert("Error",err)
             }
             ThsCard.cardLoad(successCallback, errorCallback);
     },
@@ -116,6 +117,16 @@ var app = {
                     alert('ERROR!!! ' + err)
                 }
                 ThsCard.acceptterms(successCallback, errorCallback);
-        }
+        },
+        getTransactionHistory: function(){
+
+               var successCallback = function(res) {
+                         res == "Configured Already" ? alert(res) : alert(`SUCCESS!!! `+ res);
+                     }
+                     var errorCallback = function(err) {
+                         alert('ERROR!!! ' + err)
+                     }
+                     ThsCard.getTransactionHistory(successCallback, errorCallback);
+             },
 }
 app.initialize();
