@@ -315,13 +315,14 @@ return true;
                             mCards.add(mCard);
                     }
 
-//                    DisplayCards displayCards =new DisplayCards(cordova.getContext(),
-////                            this,
-//                            mCards,
-//                            DisplayCards.DisplayType.CARD_LIST_MAIN,callbackContext);
-//                    totalCards.add( displayCards.showCards(0));
-//                    Log.d("Total Cards",totalCards.toString());
-                    THSCard.callbackObject.success(mCards.toString());
+                    DisplayCards displayCards =new DisplayCards(cordova.getContext(),
+//                            this,
+                            mCards,
+                            DisplayCards.DisplayType.CARD_LIST_MAIN,callbackContext);
+                    displayCards.showCards(0);
+                    Log.d("Total Cards",totalCards.toString());
+
+//                    THSCard.callbackObject.success(mCards.toString());
 
 
 //                    findViewById(R.id.no_cards).setVisibility((mCards.size() > 0) ? View.GONE : View.VISIBLE);

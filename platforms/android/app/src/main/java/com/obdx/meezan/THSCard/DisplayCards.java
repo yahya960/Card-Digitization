@@ -22,6 +22,9 @@ import com.obdx.meezan.THSCard.model.MyDigitalCard;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +42,7 @@ public class DisplayCards {
 //    private CardListAdapterCallback callback;
     private final DisplayType displayType;
     private static CallbackContext callbackObject;
+    private int position;
 
     public DisplayCards(Context context, List<MyDigitalCard> cards, final DisplayType displayType,final CallbackContext callbackContext) {
         this.context = context;
@@ -46,22 +50,49 @@ public class DisplayCards {
 //        this.callback = (CardListAdapterCallback) callback;
         this.displayType = displayType;
         this.callbackObject = callbackContext;
+        this.position = 0;
     }
 
-    public MyDigitalCard showCards(int position){
+    public void showCards(int position){
 
 //        MyViewHolder mHolder = (MyViewHolder) holder;
 //        final MyDigitalCard call;
 //        LMyDigitalCard mCards = new ArrayList<>();
-        final MyDigitalCard card = cards.get(position);
-        int numberOfPayment = card.getCardStatus().getNumberOfPaymentsLeft();
-        DigitalizedCard dCard = DigitalizedCardManager.getDigitalizedCard(card.getTokenId());
-//        dCard.getCardDetails(new AbstractAsyncHandler<DigitalizedCardDetails>() {
-//            @SuppressLint("HandlerLeak")
-//            @Override
-//            public void onComplete(AsyncResult<DigitalizedCardDetails> asyncResult) {
+
+        for(MyDigitalCard card : cards) {
+            position++;
+//            final MyDigitalCard card = cards.get(position);
+            int numberOfPayment = card.getCardStatus().getNumberOfPaymentsLeft();
+            DigitalizedCard dCard = DigitalizedCardManager.getDigitalizedCard(card.getTokenId());
+            final int a = position;
+            dCard.getCardDetails(new AbstractAsyncHandler<DigitalizedCardDetails>() {
+                JSONArray response = new JSONArray();
+
+                @SuppressLint("HandlerLeak")
+                @Override
+                public void onComplete(AsyncResult<DigitalizedCardDetails> asyncResult) {
 //
-//                if(asyncResult.isSuccessful()) {
+                    if (asyncResult.isSuccessful()) {
+                        JSONObject item = new JSONObject();
+                        try {
+                            item.put("TokenId",card.getTokenId());
+                            item.put("Digital Card ID",card.getDigitalizedCardId());
+                            item.put("Default",card.isDefaultCardFlag());
+                            item.put("Card State",card.getCardStatus().getState());
+                            item.put("Payment Remaining",numberOfPayment);
+                            item.put("PAN Expiry",asyncResult.getResult().getPanExpiry());
+                            item.put("DPAN LastDigit",asyncResult.getResult().getLastFourDigitsOfDPAN());
+                            item.put("FPAN LastDigit",asyncResult.getResult().getLastFourDigits());
+                            response.put(item);
+                            if(a == cards.size()){
+                                callbackObject.success(response.toString());
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+
 //                    Log.d("callback",callbackObject.getCallbackId());
 //                    mCards.add(card);
 //                call = new MyDigitalCard(dCard)
@@ -83,12 +114,17 @@ public class DisplayCards {
 
 
 //                    Log.d("Card Details", card.toString());
-//                }
-//
-//            }
-//        });
-//        callbackObject.success(card.toString());
-        return card;
+                    }
+
+                }
+
+            });
+
+
+        }
+
+
+//        return card;
     }
 
 //    private class MyViewHolder extends RecyclerView.ViewHolder {
